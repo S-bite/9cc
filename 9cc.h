@@ -8,64 +8,61 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum
-{
-    TK_RESERVED,
-    TK_IDENT,
-    TK_NUM,
-    TK_IF,
-    TK_ELSE,
-    TK_WHILE,
-    TK_RETURN,
-    TK_FOR,
-    TK_SIZEOF,
-    TK_INT,
-    TK_STR,
-    TK_CHAR,
-    TK_STRUCT,
-    TK_DOT,
-    TK_ARROW,
-    TK_EOF
+typedef enum {
+  TK_RESERVED,
+  TK_IDENT,
+  TK_NUM,
+  TK_IF,
+  TK_ELSE,
+  TK_WHILE,
+  TK_RETURN,
+  TK_FOR,
+  TK_SIZEOF,
+  TK_INT,
+  TK_STR,
+  TK_CHAR,
+  TK_STRUCT,
+  TK_DOT,
+  TK_ARROW,
+  TK_EOF
 } TokenKind;
 
 typedef struct Token Token;
 
-struct Token
-{
-    TokenKind kind;
-    Token *next;
-    int val;
-    char *str;
-    int len;
+struct Token {
+  TokenKind kind;
+  Token *next;
+  int val;
+  char *str;
+  int len;
 };
 
-typedef enum
-{
-    ND_ADD,
-    ND_SUB,
-    ND_MUL,
-    ND_DIV,
-    ND_MOD,
-    ND_NUM,
-    ND_EQ,
-    ND_NEQ,
-    ND_LT,
-    ND_LEQ,
-    ND_ASSIGN,
-    ND_ADDR,
-    ND_DEREF,
-    ND_LVAR,
-    ND_FUNC,
-    ND_GVAR,
-    ND_STR,
-    ND_CALL,
-    ND_IF,
-    ND_IFELSE,
-    ND_WHILE,
-    ND_FOR,
-    ND_BLOCK,
-    ND_RETURN,
-    ND_NOP,
+typedef enum {
+  ND_ADD,
+  ND_SUB,
+  ND_MUL,
+  ND_DIV,
+  ND_MOD,
+  ND_NUM,
+  ND_EQ,
+  ND_NEQ,
+  ND_LT,
+  ND_LEQ,
+  ND_ASSIGN,
+  ND_ADDR,
+  ND_DEREF,
+  ND_LVAR,
+  ND_FUNC,
+  ND_GVAR,
+  ND_STR,
+  ND_CALL,
+  ND_IF,
+  ND_IFELSE,
+  ND_WHILE,
+  ND_FOR,
+  ND_BLOCK,
+  ND_RETURN,
+  ND_NOP,
 } NodeKind;
 
 typedef struct Node Node;
@@ -77,93 +74,87 @@ typedef struct Struct Struct;
 typedef struct Type Type;
 typedef struct Member Member;
 
-struct Type
-{
-    enum
-    {
-        INT,
-        CHAR,
-        PTR,
-        ARRAY,
-        STRUCT,
-        VOID,
-    } ty;
-    Type *base;
-    Member *members;
-    int array_size; // tyがARRAYだった場合、その要素数 例えばint a[2][3][4]のとき、a[0]は3,a[0][0]は4
+typedef enum {
+  INT,
+  CHAR,
+  PTR,
+  ARRAY,
+  STRUCT,
+  VOID,
+} TypeKind;
+
+struct Type {
+  TypeKind ty;
+  Type *base;
+  Member *members;
+  int array_size; // tyがARRAYだった場合、その要素数 例えばint
+                  // a[2][3][4]のとき、a[0]は3,a[0][0]は4
 };
 
-struct Member
-{
-    Member *next;
-    Type *ty;
-    char *name;
-    int len;
-    int offset;
+struct Member {
+  Member *next;
+  Type *ty;
+  char *name;
+  int len;
+  int offset;
 };
 
-struct Node
-{
-    NodeKind kind;
-    Node *lhs;
-    Node *rhs;
-    Node *target;
-    Node *condition;
-    Node *true_statement;
-    Node *false_statement;
-    Node *initialize;
-    Node *update;
-    Node *statement;
+struct Node {
+  NodeKind kind;
+  Node *lhs;
+  Node *rhs;
+  Node *target;
+  Node *condition;
+  Node *true_statement;
+  Node *false_statement;
+  Node *initialize;
+  Node *update;
+  Node *statement;
 
-    Block *block;
-    int val;         // kindがND_NUMの場合のみ使う
-    int offset;      // kindがND_LVARの場合のみ使う
-    char *gvarname;  // kindがND_GVALの場合のみ使う
-    int gvarnamelen; // kindがND_GVALの場合のみ使う
-    char *funcname;  // kindがND_CALLまたはND_FUNCの場合のみ使う
-    int funcnamelen; // kindがND_CALLまたはND_FUNCの場合のみ使う
-    Arg *args;       // kindがND_CALLの場合のみ使う
-    int argnum;      // kindがND_FUNCの場合のみ使う
-    Type *type;      // そのノードを処理した結果の型を持つ
-    Type *type2;     // ノードの型（いずれはこちらに切り替える）
-    Str *str;        // kindがND_STRの場合のみ使う
+  Block *block;
+  int val;         // kindがND_NUMの場合のみ使う
+  int offset;      // kindがND_LVARの場合のみ使う
+  char *gvarname;  // kindがND_GVALの場合のみ使う
+  int gvarnamelen; // kindがND_GVALの場合のみ使う
+  char *funcname;  // kindがND_CALLまたはND_FUNCの場合のみ使う
+  int funcnamelen; // kindがND_CALLまたはND_FUNCの場合のみ使う
+  Arg *args;       // kindがND_CALLの場合のみ使う
+  int argnum;      // kindがND_FUNCの場合のみ使う
+  Type *type;      // そのノードを処理した結果の型を持つ
+  Type *type2; // ノードの型（いずれはこちらに切り替える）
+  Str *str;    // kindがND_STRの場合のみ使う
 };
-struct Block
-{
-    Node *stmt_node;
-    Block *next;
+struct Block {
+  Node *stmt_node;
+  Block *next;
 };
 
-struct Variable
-{
-    Variable *next;
-    char *name;
-    int len;
-    int offset;
-    int size;
-    Type *type;
+struct Variable {
+  Variable *next;
+  char *name;
+  int len;
+  int offset;
+  int size;
+  Type *type;
 };
 
-struct Struct
-{
-    Struct *next;
-    char *name;
-    int len;
-    Type *type;
+struct Struct {
+  Struct *next;
+  char *name;
+  int len;
+  Type *type;
 };
 
-struct Str
-{
-    Str *next;
-    char *str;
-    int len;
-    int id;
+struct Str {
+  Str *next;
+  char *str;
+  int len;
+  int id;
 };
 
-struct Arg
-{
-    Node *node;
-    Arg *next;
+struct Arg {
+  Node *node;
+  Arg *next;
 };
 
 void error(char *fmt, ...);
